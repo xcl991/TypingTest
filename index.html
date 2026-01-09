@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="description" content="KeyTyping - Latih kecepatan mengetik Anda dengan tes mengetik interaktif">
+
+    <title>KeyTyping - Typing Speed Test</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Redirect Overlay (for web switching) -->
+    <div id="redirectOverlay" class="redirect-overlay hidden">
+        <div class="redirect-content">
+            <div class="redirect-icon">🚀</div>
+            <h2>Mengalihkan...</h2>
+            <p id="redirectMessage">Anda akan dialihkan ke versi baru</p>
+            <div class="redirect-progress">
+                <div class="redirect-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Overlay -->
+    <div id="maintenanceOverlay" class="maintenance-overlay hidden">
+        <div class="maintenance-content">
+            <div class="maintenance-icon">🔧</div>
+            <h2>Sedang Maintenance</h2>
+            <p id="maintenanceMessage">Kami sedang melakukan pemeliharaan. Silakan kembali lagi nanti.</p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">⌨️</span>
+                <span class="logo-text">KeyTyping</span>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-btn active" data-view="practice">Latihan</button>
+                <button class="nav-btn" data-view="stats">Statistik</button>
+                <button class="nav-btn" data-view="settings">Pengaturan</button>
+            </nav>
+            <button class="menu-toggle" id="menuToggle">☰</button>
+        </header>
+
+        <!-- Mobile Navigation -->
+        <div id="mobileNav" class="mobile-nav hidden">
+            <button class="nav-btn active" data-view="practice">Latihan</button>
+            <button class="nav-btn" data-view="stats">Statistik</button>
+            <button class="nav-btn" data-view="settings">Pengaturan</button>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Practice View -->
+            <section id="practiceView" class="view active">
+                <!-- Test Mode Selection -->
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="time" data-value="60">1 Menit</button>
+                    <button class="mode-btn" data-mode="time" data-value="120">2 Menit</button>
+                    <button class="mode-btn" data-mode="words" data-value="25">25 Kata</button>
+                    <button class="mode-btn" data-mode="words" data-value="50">50 Kata</button>
+                </div>
+
+                <!-- Live Stats -->
+                <div class="live-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="liveWpm">0</span>
+                        <span class="stat-label">WPM</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="liveAccuracy">100</span>
+                        <span class="stat-label">%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="liveTimer">60</span>
+                        <span class="stat-label" id="timerLabel">detik</span>
+                    </div>
+                </div>
+
+                <!-- Typing Area -->
+                <div class="typing-container">
+                    <div class="text-display" id="textDisplay">
+                        <div class="text-content" id="textContent">
+                            <!-- Words will be rendered here -->
+                        </div>
+                    </div>
+
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="typingInput"
+                            class="typing-input"
+                            placeholder="Ketik di sini untuk mulai..."
+                            autocomplete="off"
+                            autocorrect="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                        >
+                    </div>
+
+                    <div class="typing-actions">
+                        <button class="action-btn restart-btn" id="restartBtn">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">Ulangi</span>
+                        </button>
+                        <button class="action-btn new-btn" id="newTestBtn">
+                            <span class="btn-icon">✨</span>
+                            <span class="btn-text">Tes Baru</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Virtual Keyboard (Mobile) -->
+                <div class="keyboard-container" id="keyboardContainer">
+                    <div class="keyboard" id="virtualKeyboard">
+                        <!-- Keyboard will be rendered by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Modal -->
+            <div id="resultsModal" class="modal hidden">
+                <div class="modal-content results-content">
+                    <div class="results-header">
+                        <h2>🎉 Tes Selesai!</h2>
+                    </div>
+                    <div class="results-stats">
+                        <div class="result-card main-result">
+                            <span class="result-value" id="resultWpm">0</span>
+                            <span class="result-label">WPM</span>
+                        </div>
+                        <div class="result-card">
+                            <span class="result-value" id="resultAccuracy">0%</span>
+                            <span class="result-label">Akurasi</span>
+                        </div>
+                        <div class="result-card">
+                            <span class="result-value" id="resultChars">0</span>
+                            <span class="result-label">Karakter</span>
+                        </div>
+                        <div class="result-card">
+                            <span class="result-value" id="resultErrors">0</span>
+                            <span class="result-label">Kesalahan</span>
+                        </div>
+                    </div>
+                    <div class="results-breakdown">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Karakter Benar</span>
+                            <span class="breakdown-value correct" id="correctChars">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Karakter Salah</span>
+                            <span class="breakdown-value incorrect" id="incorrectChars">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Kata Diselesaikan</span>
+                            <span class="breakdown-value" id="completedWords">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Waktu</span>
+                            <span class="breakdown-value" id="totalTime">0s</span>
+                        </div>
+                    </div>
+                    <div class="results-actions">
+                        <button class="action-btn primary-btn" id="tryAgainBtn">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">Coba Lagi</span>
+                        </button>
+                        <button class="action-btn secondary-btn" id="newTestModalBtn">
+                            <span class="btn-icon">✨</span>
+                            <span class="btn-text">Tes Baru</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats View -->
+            <section id="statsView" class="view hidden">
+                <div class="stats-container">
+                    <h2 class="section-title">📊 Statistik Anda</h2>
+
+                    <div class="stats-summary">
+                        <div class="summary-card">
+                            <span class="summary-icon">🏆</span>
+                            <span class="summary-value" id="bestWpm">0</span>
+                            <span class="summary-label">WPM Terbaik</span>
+                        </div>
+                        <div class="summary-card">
+                            <span class="summary-icon">📈</span>
+                            <span class="summary-value" id="avgWpm">0</span>
+                            <span class="summary-label">Rata-rata WPM</span>
+                        </div>
+                        <div class="summary-card">
+                            <span class="summary-icon">🎯</span>
+                            <span class="summary-value" id="avgAccuracy">0%</span>
+                            <span class="summary-label">Rata-rata Akurasi</span>
+                        </div>
+                        <div class="summary-card">
+                            <span class="summary-icon">📝</span>
+                            <span class="summary-value" id="totalTests">0</span>
+                            <span class="summary-label">Total Tes</span>
+                        </div>
+                    </div>
+
+                    <div class="history-section">
+                        <h3 class="subsection-title">Riwayat Tes</h3>
+                        <div class="history-list" id="historyList">
+                            <p class="empty-history">Belum ada riwayat tes</p>
+                        </div>
+                    </div>
+
+                    <button class="action-btn danger-btn" id="clearHistoryBtn">
+                        <span class="btn-icon">🗑️</span>
+                        <span class="btn-text">Hapus Riwayat</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Settings View -->
+            <section id="settingsView" class="view hidden">
+                <div class="settings-container">
+                    <h2 class="section-title">⚙️ Pengaturan</h2>
+
+                    <div class="setting-group">
+                        <h3 class="setting-title">Tampilan</h3>
+
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <span>Tema</span>
+                            </label>
+                            <select id="themeSetting" class="setting-select">
+                                <option value="dark">Gelap</option>
+                                <option value="light">Terang</option>
+                                <option value="ocean">Ocean</option>
+                                <option value="forest">Forest</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <span>Ukuran Font</span>
+                            </label>
+                            <select id="fontSizeSetting" class="setting-select">
+                                <option value="small">Kecil</option>
+                                <option value="medium" selected>Sedang</option>
+                                <option value="large">Besar</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <span>Tampilkan Keyboard Virtual</span>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="showKeyboardSetting" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3 class="setting-title">Tes</h3>
+
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <span>Bahasa Teks</span>
+                            </label>
+                            <select id="languageSetting" class="setting-select">
+                                <option value="id" selected>Indonesia</option>
+                                <option value="en">English</option>
+                                <option value="mixed">Campuran</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <span>Tingkat Kesulitan</span>
+                            </label>
+                            <select id="difficultySetting" class="setting-select">
+                                <option value="easy">Mudah</option>
+                                <option value="medium" selected>Sedang</option>
+                                <option value="hard">Sulit</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <span>Suara Ketikan</span>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="soundSetting">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <span>Hapus Input Otomatis</span>
+                            </label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="autoClearSetting" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3 class="setting-title">Tentang</h3>
+                        <div class="about-info">
+                            <p><strong>KeyTyping</strong> v1.0.0</p>
+                            <p>Aplikasi latihan mengetik dengan fitur lengkap untuk meningkatkan kecepatan dan akurasi mengetik Anda.</p>
+                            <p>Developed by <strong>SunAwaysDevs</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 KeyTyping by SunAwaysDevs. Made with ❤️</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner"></div>
+        <p>Memuat...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api-config.js"></script>
+    <script src="js/word-data.js"></script>
+    <script src="js/data-service.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
