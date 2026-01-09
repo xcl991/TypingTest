@@ -2,10 +2,9 @@
   "name": "keytyping",
   "version": "1.0.0",
   "description": "KeyTyping - Typing Speed Test Application with mobile support",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
+    "start": "npx serve .",
+    "server": "node server.node.js",
     "serve": "npx serve ."
   },
   "keywords": [

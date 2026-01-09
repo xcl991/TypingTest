@@ -44,12 +44,9 @@ class DataService {
      * Load configuration from Supabase or cache
      */
     async loadConfig() {
-        // Check cache first
-        const cached = this.getFromCache(API_CONFIG.CACHE_KEYS.CONFIG);
-        if (cached) {
-            this.config = cached;
-            return cached;
-        }
+        // Skip cache for routing - always fetch fresh config
+        // This ensures routing changes take effect immediately
+        console.log('Loading config from Supabase...');
 
         // If Supabase is configured, fetch from there
         if (this.isSupabaseConfigured()) {
@@ -64,17 +61,25 @@ class DataService {
                     }
                 );
 
+                console.log('Supabase response status:', response.status);
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Supabase data:', data);
                     if (data && data.length > 0) {
                         this.config = data[0];
-                        this.setCache(API_CONFIG.CACHE_KEYS.CONFIG, this.config, API_CONFIG.CACHE_TTL.CONFIG);
+                        console.log('Config loaded:', this.config);
                         return this.config;
+                    } else {
+                        console.warn('No config data in Supabase table');
                     }
+                } else {
+                    console.warn('Supabase response not OK:', response.status);
                 }
             } catch (error) {
                 console.warn('Failed to fetch config from Supabase:', error);
             }
+        } else {
+            console.warn('Supabase not configured');
         }
 
         // Return default config
@@ -121,15 +126,34 @@ class DataService {
      * Check for web routing/redirect
      */
     async checkRouting() {
-        if (!this.config || !this.config.routing) return;
+        console.log('Checking routing, config:', this.config);
+
+        if (!this.config || !this.config.routing) {
+            console.log('No routing config found');
+            return;
+        }
 
         const routing = this.config.routing;
+        console.log('Routing data:', routing);
 
         if (routing.enabled && routing.active_web && routing.webs) {
             const activeWeb = routing.webs[routing.active_web];
+            console.log('Active web:', routing.active_web, activeWeb);
 
             if (activeWeb && activeWeb.redirect_url) {
-                this.showRedirectOverlay(activeWeb.redirect_url, activeWeb.name);
+                // Check if we're already on the target URL (prevent infinite loop)
+                const currentUrl = window.location.href.replace(/\/$/, ''); // Remove trailing slash
+                const targetUrl = activeWeb.redirect_url.replace(/\/$/, '');
+
+                console.log('Current URL:', currentUrl);
+                console.log('Target URL:', targetUrl);
+
+                if (currentUrl !== targetUrl && !currentUrl.startsWith(targetUrl)) {
+                    console.log('Redirecting to:', activeWeb.redirect_url);
+                    this.showRedirectOverlay(activeWeb.redirect_url, activeWeb.name);
+                } else {
+                    console.log('Already on target URL, skipping redirect');
+                }
             }
         }
     }
