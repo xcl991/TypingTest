@@ -18,8 +18,8 @@ app.use(express.static(path.join(__dirname)));
 
 // Configuration (can be moved to .env file)
 const CONFIG = {
-    SUPABASE_URL: process.env.SUPABASE_URL || 'https://your-project.supabase.co',
-    SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY || 'your-service-key',
+    SUPABASE_URL: process.env.SUPABASE_URL || 'https://fhwgzsxrhwozgjiyvycg.supabase.co',
+    SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZod2d6c3hyaHdvemdqaXl2eWNnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Nzk1MTExNCwiZXhwIjoyMDgzNTI3MTE0fQ.K1xqYWKYZI4xOEfB8Rw1KHjb4QdxGmrZfEVkYWpFxgg',
     MAX_LEADERBOARD_ENTRIES: 100
 };
 

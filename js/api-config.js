@@ -5,9 +5,8 @@
 
 const API_CONFIG = {
     // Supabase Configuration
-    // Replace with your actual Supabase credentials
-    SUPABASE_URL: 'https://your-project.supabase.co',
-    SUPABASE_ANON_KEY: 'your-anon-key-here',
+    SUPABASE_URL: 'https://fhwgzsxrhwozgjiyvycg.supabase.co',
+    SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZod2d6c3hyaHdvemdqaXl2eWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc5NTExMTQsImV4cCI6MjA4MzUyNzExNH0.dfcY6swn6FJ0dAG4OooeJUfKiNqp5l_kzEPLkJojk0k',
 
     // Tables
     TABLES: {
